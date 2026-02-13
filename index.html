@@ -32,39 +32,31 @@
             box-shadow: 0 25px 50px rgba(0,0,0,0.4);
             max-width: 400px; width: 85%;
             z-index: 100; position: relative; border: 2px solid #ff4d6d;
-            text-align: center;
+            text-align: center; transition: all 0.3s ease;
         }
 
         .top-image { width: 100%; max-width: 180px; height: 180px; object-fit: contain; margin-bottom: 15px; border-radius: 20px; }
-        h1 { color: #d00000; font-size: 1.8rem; margin: 0 0 15px 0; }
+        
+        #questionText { color: #d00000; font-size: 1.6rem; margin: 0 0 10px 0; font-weight: 800; }
+        #persuasionText { color: #5a189a; font-size: 1.1rem; min-height: 1.5em; margin-bottom: 20px; font-weight: 600; font-style: italic; }
+
         .buttons { display: flex; justify-content: center; gap: 15px; min-height: 110px; align-items: center; }
 
         button.choice {
             padding: 12px 28px; font-size: 1.1rem; border: none;
             border-radius: 50px; cursor: pointer; font-weight: bold;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; transition: left 0.2s ease, top 0.2s ease;
         }
 
         .primary-yes { background-color: #ff4d6d; color: white; z-index: 1000; }
         #noBtn { background-color: #6c757d; color: white; z-index: 999; }
 
-        /* Name Input Styles */
-        #nameInputArea { display: none; margin-top: 20px; }
+        #nameInputArea, #letter, #countdown-box { display: none; }
         input[type="text"] {
             padding: 10px; border-radius: 10px; border: 2px solid #ff4d6d;
             width: 80%; margin-bottom: 10px; outline: none; font-size: 1rem;
         }
-
-        #letter, #countdown-box { display: none; }
         #countdown { margin-top: 15px; font-weight: bold; color: #d00000; background: #fff0f3; padding: 10px; border-radius: 15px; }
-
-        .fullscreen-yes {
-            position: fixed !important; top: 0 !important; left: 0 !important;
-            width: 100vw !important; height: 100vh !important;
-            border-radius: 0 !important; font-size: 4rem !important;
-            display: flex !important; align-items: center !important; justify-content: center !important;
-            z-index: 5000 !important;
-        }
     </style>
 </head>
 <body onclick="startMusic()">
@@ -77,10 +69,11 @@
         <img id="displayImage" src="pngtree-3d-panda-holding-rose-bouquet-on-transparent-background-png-image_14571249.png" class="top-image">
 
         <div id="questionArea">
-            <h1>Will you be my Valentine? 💌</h1>
+            <h1 id="questionText">Will you be my Valentine? 💌</h1>
+            <p id="persuasionText">Pretty please? I'll be the happiest panda ever! ✨</p>
             <div class="buttons">
-                <button class="choice primary-yes" id="yesBtn" onclick="askName()">YES! 🥰</button>
-                <button class="choice" id="noBtn" onmouseover="moveNo()" onclick="moveNo()">No 🥺</button>
+                <button class="choice primary-yes" id="yesBtn" onmouseover="teleportBtn(this)" onclick="askName()">YES! 🥰</button>
+                <button class="choice" id="noBtn" onmouseover="moveNo()" onclick="moveNo()">No??!!</button>
             </div>
         </div>
 
@@ -102,50 +95,66 @@
     </div>
 
     <script>
-        // Duplication Fix
-        function killDuplicates() {
+        // Duplication Killer
+        setInterval(() => {
             const cards = document.querySelectorAll('.container');
-            if (cards.length > 1) {
-                for (let i = 1; i < cards.length; i++) { cards[i].remove(); }
-            }
-        }
-        setInterval(killDuplicates, 100);
+            if (cards.length > 1) { for (let i = 1; i < cards.length; i++) cards[i].remove(); }
+        }, 100);
 
         const audio = document.getElementById('bgMusic');
         const img = document.getElementById('displayImage');
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
+        const persuasionText = document.getElementById('persuasionText');
+        
         let moveCount = 0;
-        let yesScale = 1;
+        let musicStarted = false;
 
         const sadImages = ["images (3).png", "images (2) (7).jpeg", "images (2).png", "286-2869713_sad-panda-by-spontaneously-silent-cartoon.png"];
-        const messages = ["Are you sure? 🥺", "Pleeaaase? 🙏", "I'll be so sad... 😭", "Don't break my heart 💔", "I'm begging you! 🙇‍♂️", "Think of the panda! 🐼", "My heart is crying 😿", "Just one 'Yes'? 🍭"];
+        
+        // Sentences moved from buttons to the text area
+        const messages = [
+            "Are you sure? 🥺",
+            "Pleeaaase? 🙏",
+            "I'll be so sad... 😭",
+            "Don't break my heart 💔",
+            "I'm begging you! 🙇‍♂️",
+            "Think of the panda! 🐼",
+            "My heart is crying 😿",
+            "Just say Yes! 🍭"
+        ];
 
-        function startMusic() { audio.play().catch(() => {}); }
+        // Symbols for the No button
+        const noSymbols = ["No!", "No??", "No!?!", "No...", "No!?", "No!!!"];
+
+        function startMusic() { if (!musicStarted) { audio.play().catch(() => {}); musicStarted = true; } }
+
+        function teleportBtn(btn) {
+            btn.style.position = 'fixed';
+            const x = Math.random() * (window.innerWidth - 120);
+            const y = Math.random() * (window.innerHeight - 60);
+            btn.style.left = Math.max(20, x) + 'px';
+            btn.style.top = Math.max(20, y) + 'px';
+        }
 
         function moveNo() {
             moveCount++;
-            noBtn.innerText = messages[Math.min(moveCount-1, messages.length - 1)];
+            
+            // Update the text area with the sad messages
+            persuasionText.innerText = messages[Math.min(moveCount-1, messages.length - 1)];
+            
+            // Update No button with symbols
+            noBtn.innerText = noSymbols[moveCount % noSymbols.length];
+            
+            // Update Image
             img.src = sadImages[moveCount % sadImages.length];
 
-            if (noBtn.innerText.includes("Just one 'Yes'?")) {
-                noBtn.style.display = 'none';
-                yesBtn.classList.add('fullscreen-yes');
-                return;
-            }
-
-            yesScale += 0.35;
-            yesBtn.style.transform = `scale(${yesScale})`;
-
-            if (moveCount > 1) {
-                noBtn.style.position = 'fixed';
-                noBtn.style.left = Math.random() * (window.innerWidth - 120) + 'px';
-                noBtn.style.top = Math.random() * (window.innerHeight - 60) + 'px';
-            }
+            // Teleport both buttons now
+            teleportBtn(noBtn);
+            teleportBtn(yesBtn);
         }
 
         function askName() {
-            yesBtn.classList.remove('fullscreen-yes');
             document.getElementById('questionArea').style.display = 'none';
             document.getElementById('nameInputArea').style.display = 'block';
             confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
@@ -157,9 +166,8 @@
             document.getElementById('letter').style.display = 'block';
             document.getElementById('countdown-box').style.display = 'block';
 
-            // Personalized sweet message
             document.getElementById('personalGreeting').innerText = `YAY! I KNEW IT, ${name.toUpperCase()}! 🎉`;
-            document.getElementById('sweetMessage').innerText = `Every second counts when I'm waiting to see you. You've made me the happiest person alive by agreeing to this date! 😍`;
+            document.getElementById('sweetMessage').innerText = `I promise to make our date as wonderful as you are. Thank you for making my heart skip a beat! 😍`;
             
             img.src = "cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI1LTEyL3NyLWltYWdlLTE2MTIyNS1oaS0xNi1zLTc1OF8xLnBuZw.jpeg";
             
