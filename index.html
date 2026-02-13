@@ -41,6 +41,7 @@
             max-width: 420px; width: 90%;
             z-index: 10; position: relative;
             border: 2px solid #ff4d6d;
+            transition: all 0.5s ease;
         }
 
         .top-image {
@@ -60,11 +61,17 @@
         button.choice {
             padding: 14px 30px; font-size: 1.2rem; border: none;
             border-radius: 50px; cursor: pointer; font-weight: bold;
-            transition: transform 0.2s ease;
+            transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease;
         }
 
-        .primary-yes { background-color: #ff4d6d; color: white; z-index: 5; }
-        #noBtn { background-color: #6c757d; color: white; z-index: 100; }
+        .primary-yes { 
+            background-color: #ff4d6d; 
+            color: white; 
+            z-index: 1001; 
+            position: relative;
+        }
+
+        #noBtn { background-color: #6c757d; color: white; z-index: 1000; }
 
         #letter, #countdown-box { display: none; }
         
@@ -78,6 +85,18 @@
             border-radius: 15px;
             display: inline-block;
         }
+
+        /* Fullscreen Yes Button class */
+        .fullscreen-yes {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            border-radius: 0 !important;
+            font-size: 5rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
     </style>
 </head>
 <body onclick="startMusic()">
@@ -86,7 +105,7 @@
         <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mpeg">
     </audio>
 
-    <div class="container">
+    <div class="container" id="card">
         <img id="displayImage" src="pngtree-3d-panda-holding-rose-bouquet-on-transparent-background-png-image_14571249.png" class="top-image">
 
         <div id="questionArea">
@@ -112,6 +131,7 @@
         const img = document.getElementById('displayImage');
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
+        const card = document.getElementById('card');
         
         let yesScale = 1;
         let moveCount = 0;
@@ -119,17 +139,15 @@
 
         const sadImages = ["images (3).png", "images (2) (7).jpeg", "images (2).png", "286-2869713_sad-panda-by-spontaneously-silent-cartoon.png"];
 
-        // NEW BEGGING & SAD MESSAGES
         const messages = [
             "Are you sure? 🥺",
             "Pleeaaase say yes! 🙏",
             "But I'll be so sad... 😭",
             "Don't break my heart 💔",
             "I'm begging you! 🙇‍♂️",
-            "I'll buy you snacks! 🍫",
             "Think of the panda! 🐼",
             "My heart is crying 😿",
-            "Just one 'Yes'? 🍭"
+            "Just one 'Yes'? 🍭" // THE TRIGGER MESSAGE
         ];
 
         function startMusic() {
@@ -142,17 +160,23 @@
         function moveNo() {
             moveCount++;
             
-            // Set message based on count
+            // 1. Change the text
             noBtn.innerText = messages[Math.min(moveCount - 1, messages.length - 1)];
             
-            // Cycle images
+            // 2. Cycle images
             img.src = sadImages[moveCount % sadImages.length];
 
-            // Yes button gets bigger
-            yesScale += 0.18;
+            // 3. Logic for the Final Message
+            if (noBtn.innerText === "Just one 'Yes'? 🍭") {
+                noBtn.style.display = 'none'; // Make No button disappear
+                yesBtn.classList.add('fullscreen-yes'); // Make Yes button fill screen
+                return;
+            }
+
+            // 4. Standard growth and movement
+            yesScale += 0.3; // Growing faster now
             yesBtn.style.transform = `scale(${yesScale})`;
 
-            // Teleport button
             if (moveCount > 1) {
                 noBtn.style.position = 'fixed';
                 const x = Math.random() * (window.innerWidth - 150);
@@ -163,9 +187,14 @@
         }
 
         function sayYes() {
+            // Remove fullscreen if it was active
+            yesBtn.classList.remove('fullscreen-yes');
+            yesBtn.style.transform = 'scale(1)';
+            
             document.getElementById('questionArea').style.display = 'none';
             document.getElementById('letter').style.display = 'block';
             document.getElementById('countdown-box').style.display = 'block';
+            
             img.src = "cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI1LTEyL3NyLWltYWdlLTE2MTIyNS1oaS0xNi1zLTc1OF8xLnBuZw.jpeg";
             
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
@@ -174,21 +203,17 @@
 
         function startCountdown() {
             const targetDate = new Date("February 14, 2026 00:00:00").getTime();
-            
             setInterval(() => {
                 const now = new Date().getTime();
                 const diff = targetDate - now;
-
                 if (diff < 0) {
                     document.getElementById('countdown').innerHTML = "It's Valentine's Day! ❤️";
                     return;
                 }
-
                 const d = Math.floor(diff / (1000 * 60 * 60 * 24));
                 const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 const s = Math.floor((diff % (1000 * 60)) / 1000);
-
                 document.getElementById('countdown').innerHTML = `${d}d ${h}h ${m}m ${s}s`;
             }, 1000);
         }
