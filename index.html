@@ -15,7 +15,6 @@
             overflow: hidden; text-align: center;
         }
 
-        /* Floating Hearts */
         .heart-particle {
             position: absolute; bottom: -50px;
             background-color: #ff4d6d;
@@ -118,8 +117,20 @@
         let moveCount = 0;
         let musicStarted = false;
 
-        // Sad Panda cycle remains
         const sadImages = ["images (3).png", "images (2) (7).jpeg", "images (2).png", "286-2869713_sad-panda-by-spontaneously-silent-cartoon.png"];
+
+        // NEW BEGGING & SAD MESSAGES
+        const messages = [
+            "Are you sure? 🥺",
+            "Pleeaaase say yes! 🙏",
+            "But I'll be so sad... 😭",
+            "Don't break my heart 💔",
+            "I'm begging you! 🙇‍♂️",
+            "I'll buy you snacks! 🍫",
+            "Think of the panda! 🐼",
+            "My heart is crying 😿",
+            "Just one 'Yes'? 🍭"
+        ];
 
         function startMusic() {
             if (!musicStarted) {
@@ -130,19 +141,22 @@
 
         function moveNo() {
             moveCount++;
-            const messages = ["Sure?", "Please?", "Sad panda...", "Rude!", "Click Yes!", "Yes? 🍭"];
-            noBtn.innerText = messages[Math.min(moveCount, messages.length - 1)];
             
-            // Cycle through sad images on "No"
+            // Set message based on count
+            noBtn.innerText = messages[Math.min(moveCount - 1, messages.length - 1)];
+            
+            // Cycle images
             img.src = sadImages[moveCount % sadImages.length];
 
-            yesScale += 0.15;
+            // Yes button gets bigger
+            yesScale += 0.18;
             yesBtn.style.transform = `scale(${yesScale})`;
 
+            // Teleport button
             if (moveCount > 1) {
                 noBtn.style.position = 'fixed';
-                const x = Math.random() * (window.innerWidth - 100);
-                const y = Math.random() * (window.innerHeight - 50);
+                const x = Math.random() * (window.innerWidth - 150);
+                const y = Math.random() * (window.innerHeight - 80);
                 noBtn.style.left = Math.max(20, x) + 'px';
                 noBtn.style.top = Math.max(20, y) + 'px';
             }
@@ -152,8 +166,6 @@
             document.getElementById('questionArea').style.display = 'none';
             document.getElementById('letter').style.display = 'block';
             document.getElementById('countdown-box').style.display = 'block';
-            
-            // Happy Panda on Yes
             img.src = "cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI1LTEyL3NyLWltYWdlLTE2MTIyNS1oaS0xNi1zLTc1OF8xLnBuZw.jpeg";
             
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
