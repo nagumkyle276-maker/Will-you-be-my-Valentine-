@@ -6,78 +6,58 @@
     <title>Be My Valentine? 🌹</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body {
-            margin: 0; padding: 0;
+        /* This ensures the background and layout are strictly locked */
+        html, body {
+            height: 100vh; width: 100vw; margin: 0; padding: 0;
+            overflow: hidden; background: linear-gradient(135deg, #9d0208 0%, #e0aaff 100%);
             display: flex; justify-content: center; align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #9d0208 0%, #e0aaff 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden; text-align: center;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
         }
 
         .heart-particle {
-            position: absolute; bottom: -50px;
-            background-color: #ff4d6d;
-            height: 20px; width: 20px;
-            transform: rotate(-45deg);
-            opacity: 0.6; z-index: 1;
-            animation: floatUp linear forwards;
+            position: absolute; bottom: -50px; background-color: #ff4d6d;
+            height: 20px; width: 20px; transform: rotate(-45deg);
+            opacity: 0.6; z-index: 1; animation: floatUp linear forwards;
         }
         .heart-particle::before, .heart-particle::after {
-            content: ""; background-color: inherit;
-            border-radius: 50%; height: 20px; position: absolute; width: 20px;
+            content: ""; background-color: inherit; border-radius: 50%;
+            height: 20px; position: absolute; width: 20px;
         }
         .heart-particle::before { top: -10px; left: 0; }
         .heart-particle::after { left: 10px; top: 0; }
-
-        @keyframes floatUp {
-            to { transform: rotate(-45deg) translateY(-110vh) scale(1.5); opacity: 0; }
-        }
+        @keyframes floatUp { to { transform: rotate(-45deg) translateY(-110vh) scale(1.5); opacity: 0; } }
 
         .container {
             background: rgba(255, 255, 255, 0.95);
             padding: 2.5rem; border-radius: 35px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-            max-width: 420px; width: 90%;
-            z-index: 10; position: relative;
-            border: 2px solid #ff4d6d;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+            max-width: 400px; width: 85%;
+            z-index: 100; position: relative; border: 2px solid #ff4d6d;
+            text-align: center;
         }
 
-        .top-image {
-            width: 100%; max-width: 200px; height: 200px;
-            object-fit: contain; border-radius: 20px;
-            margin-bottom: 15px;
-        }
-
-        h1 { color: #d00000; margin-top: 0; font-weight: 800; }
-        p { color: #3c096c; font-weight: 500; }
-
-        .buttons {
-            display: flex; justify-content: center;
-            gap: 20px; align-items: center; min-height: 120px;
-        }
+        .top-image { width: 100%; max-width: 180px; height: 180px; object-fit: contain; margin-bottom: 15px; border-radius: 20px; }
+        h1 { color: #d00000; font-size: 1.8rem; margin: 0 0 15px 0; }
+        .buttons { display: flex; justify-content: center; gap: 15px; min-height: 110px; align-items: center; }
 
         button.choice {
-            padding: 14px 30px; font-size: 1.2rem; border: none;
+            padding: 12px 28px; font-size: 1.1rem; border: none;
             border-radius: 50px; cursor: pointer; font-weight: bold;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .primary-yes { background-color: #ff4d6d; color: white; z-index: 1001; }
-        #noBtn { background-color: #6c757d; color: white; z-index: 1000; }
+        .primary-yes { background-color: #ff4d6d; color: white; z-index: 1000; }
+        #noBtn { background-color: #6c757d; color: white; z-index: 999; }
 
         #letter, #countdown-box { display: none; }
-        
-        #countdown {
-            margin-top: 20px; font-size: 1.1rem; color: #ba181b; font-weight: bold;
-            background: #fff0f3; padding: 10px; border-radius: 15px; display: inline-block;
-        }
+        #countdown { margin-top: 15px; font-weight: bold; color: #d00000; background: #fff0f3; padding: 10px; border-radius: 15px; }
 
         .fullscreen-yes {
             position: fixed !important; top: 0 !important; left: 0 !important;
             width: 100vw !important; height: 100vh !important;
             border-radius: 0 !important; font-size: 4rem !important;
             display: flex !important; align-items: center !important; justify-content: center !important;
+            z-index: 5000 !important;
         }
     </style>
 </head>
@@ -87,7 +67,7 @@
         <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mpeg">
     </audio>
 
-    <div class="container" id="mainCard">
+    <div class="container" id="main-card">
         <img id="displayImage" src="pngtree-3d-panda-holding-rose-bouquet-on-transparent-background-png-image_14571249.png" class="top-image">
 
         <div id="questionArea">
@@ -100,37 +80,42 @@
 
         <div id="letter">
             <h2>YAY! I KNEW IT! 🎉</h2>
-            <p>I can't wait to spend the day with you! 😍</p>
+            <p>I can't wait to see you! 😍</p>
             <div id="countdown-box">
-                <p>Time until our date (6:00 PM): ⏳</p>
-                <div id="countdown">Loading...</div>
+                <p>Time until our date: ⏳</p>
+                <div id="countdown"></div>
             </div>
         </div>
     </div>
 
     <script>
+        // DUPLICATION KILLER: If more than one card exists, delete the extras
+        function killDuplicates() {
+            const cards = document.querySelectorAll('.container');
+            if (cards.length > 1) {
+                for (let i = 1; i < cards.length; i++) { cards[i].remove(); }
+            }
+        }
+        setInterval(killDuplicates, 100);
+
         const audio = document.getElementById('bgMusic');
         const img = document.getElementById('displayImage');
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
-        
-        let yesScale = 1;
         let moveCount = 0;
-        let musicStarted = false;
+        let yesScale = 1;
 
         const sadImages = ["images (3).png", "images (2) (7).jpeg", "images (2).png", "286-2869713_sad-panda-by-spontaneously-silent-cartoon.png"];
         const messages = ["Are you sure? 🥺", "Pleeaaase? 🙏", "I'll be so sad... 😭", "Don't break my heart 💔", "I'm begging you! 🙇‍♂️", "Think of the panda! 🐼", "My heart is crying 😿", "Just one 'Yes'? 🍭"];
 
-        function startMusic() {
-            if (!musicStarted) { audio.play().catch(() => {}); musicStarted = true; }
-        }
+        function startMusic() { audio.play().catch(() => {}); }
 
         function moveNo() {
             moveCount++;
-            noBtn.innerText = messages[Math.min(moveCount - 1, messages.length - 1)];
+            noBtn.innerText = messages[Math.min(moveCount-1, messages.length-1)];
             img.src = sadImages[moveCount % sadImages.length];
 
-            if (noBtn.innerText === "Just one 'Yes'? 🍭") {
+            if (noBtn.innerText.includes("Just one 'Yes'?")) {
                 noBtn.style.display = 'none';
                 yesBtn.classList.add('fullscreen-yes');
                 return;
@@ -141,10 +126,8 @@
 
             if (moveCount > 1) {
                 noBtn.style.position = 'fixed';
-                const x = Math.random() * (window.innerWidth - 150);
-                const y = Math.random() * (window.innerHeight - 80);
-                noBtn.style.left = Math.max(20, x) + 'px';
-                noBtn.style.top = Math.max(20, y) + 'px';
+                noBtn.style.left = Math.random() * (window.innerWidth - 120) + 'px';
+                noBtn.style.top = Math.random() * (window.innerHeight - 60) + 'px';
             }
         }
 
@@ -160,15 +143,14 @@
         }
 
         function startCountdown() {
-            const targetDate = new Date("February 14, 2026 18:00:00").getTime();
+            const target = new Date("February 14, 2026 18:00:00").getTime();
             setInterval(() => {
-                const now = new Date().getTime();
-                const diff = targetDate - now;
-                if (diff < 0) { document.getElementById('countdown').innerHTML = "Happy Valentine's Day! ❤️"; return; }
-                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                const diff = target - new Date().getTime();
+                if (diff < 0) { document.getElementById('countdown').innerHTML = "HAPPY VALENTINE'S! ❤️"; return; }
+                const d = Math.floor(diff / 86400000);
+                const h = Math.floor((diff % 86400000) / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
                 document.getElementById('countdown').innerHTML = `${d}d ${h}h ${m}m ${s}s`;
             }, 1000);
         }
@@ -177,9 +159,9 @@
             const heart = document.createElement('div');
             heart.classList.add('heart-particle');
             heart.style.left = Math.random() * 100 + "vw";
-            heart.style.animationDuration = (Math.random() * 3 + 3) + "s";
+            heart.style.animationDuration = (Math.random() * 2 + 3) + "s";
             document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 6000);
+            setTimeout(() => heart.remove(), 5000);
         }, 400);
     </script>
 </body>
