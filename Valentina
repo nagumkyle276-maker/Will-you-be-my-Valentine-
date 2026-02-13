@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine? 🌹</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary-red: #ba181b;
+            --soft-green: #6a994e;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #9d0208 0%, #e0aaff 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden; text-align: center;
+            transition: background 1.5s ease;
+        }
+
+        /* Floating Hearts Animation */
+        .heart-particle {
+            position: absolute; bottom: -50px;
+            background-color: #ff4d6d;
+            height: 20px; width: 20px;
+            transform: rotate(-45deg);
+            opacity: 0.6; z-index: 1;
+            animation: floatUp linear forwards;
+        }
+        .heart-particle::before, .heart-particle::after {
+            content: ""; background-color: inherit;
+            border-radius: 50%; height: 20px; position: absolute; width: 20px;
+        }
+        .heart-particle::before { top: -10px; left: 0; }
+        .heart-particle::after { left: 10px; top: 0; }
+
+        @keyframes floatUp {
+            to { transform: rotate(-45deg) translateY(-110vh) scale(1.5); opacity: 0; }
+        }
+
+        #musicToggle {
+            position: fixed; top: 25px; right: 25px;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 12px; border-radius: 50%; cursor: pointer; z-index: 100;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            padding: 2.5rem; border-radius: 35px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            max-width: 450px; width: 90%; z-index: 10;
+            border: 2px solid #ff4d6d;
+        }
+
+        /* --- THE IMAGE STYLE --- */
+        .top-image {
+            width: 100%;
+            max-width: 200px; /* Adjust size here */
+            height: auto;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 { color: #d00000; margin-top: 0; font-weight: 800; letter-spacing: -1px; }
+        p { color: #3c096c; line-height: 1.6; font-size: 1.15rem; font-weight: 500; }
+
+        .buttons {
+            display: flex; justify-content: center;
+            gap: 15px; align-items: center; min-height: 130px;
+        }
+
+        button.choice {
+            padding: 14px 30px; font-size: 1.2rem; border: none;
+            border-radius: 50px; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: bold;
+        }
+
+        .primary-yes { background-color: #ff4d6d; color: white; box-shadow: 0 8px 20px rgba(255, 77, 109, 0.4); }
+        #noBtn { background-color: #6c757d; color: white; position: relative; }
+
+        #persuasionArea, #letter { display: none; }
+        .fade-in { animation: fadeIn 0.8s ease-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body onclick="autoPlayMusic()">
+
+    <audio id="bgMusic" loop>
+        <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mpeg">
+    </audio>
+
+    <button id="musicToggle" onclick="toggleMusic(event)">🎵</button>
+
+    <div class="container">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHIwdW1ubmFia3p6eXN0eXF6bmZ6bXF6Znp6Znp6Znp6Znp6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1z/v4O8WIdPpxTCV7vU2r/giphy.gif" alt="Valentine Image" class="top-image">
+
+        <div id="questionArea" class="fade-in">
+            <h1>Will you be my Valentine? 💌</h1>
+            <div class="buttons">
+                <button class="choice primary-yes" id="yesBtn" onclick="sayYes()">YES! 🥰</button>
+                <button class="choice" id="noBtn" onmouseover="moveAndChange()" onclick="handleNoClick()">No 🥺</button>
+            </div>
+        </div>
+
+        <div id="persuasionArea" class="fade-in">
+            <h2>Wait, just one more thing... ✨</h2>
+            <p>I promise to fill our day with all your favorite things 🍦 and enough smiles to last the whole year! My heart is already set on you 🧸—can we make it official? 💍</p>
+            <div class="buttons">
+                <button class="choice primary-yes" onclick="sayYes()">I'd love to! ❤️</button>
+                <button class="choice primary-yes" onclick="sayYes()">Yes, please! ✨</button>
+            </div>
+        </div>
+
+        <div id="letter" class="fade-in">
+            <h2>I KNEW YOU'D SAY YES! 🎉</h2>
+            <p>You just made my entire year! 🌟 For our date on <strong>February 14th</strong>, I want to make sure you feel like the luckiest person in the world. 🌎</p>
+            <p>I'm planning a beautiful evening just for us. 🕯️ I can't wait to see you! 😍</p>
+            <p><strong>See you on the 14th! 🌹</strong></p>
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('bgMusic');
+        let musicStarted = false;
+
+        function autoPlayMusic() {
+            if (!musicStarted) {
+                audio.play().then(() => {
+                    document.getElementById('musicToggle').innerText = "⏸️";
+                    musicStarted = true;
+                }).catch(e => console.log("Waiting for interaction..."));
+            }
+        }
+
+        function toggleMusic(event) {
+            event.stopPropagation();
+            if (audio.paused) { audio.play(); document.getElementById('musicToggle').innerText = "⏸️"; musicStarted = true; } 
+            else { audio.pause(); document.getElementById('musicToggle').innerText = "🎵"; }
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart-particle');
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.animationDuration = Math.random() * 3 + 4 + "s";
+            heart.style.opacity = Math.random() * 0.4 + 0.2;
+            const size = Math.random() * 10 + 10 + "px";
+            heart.style.width = size; heart.style.height = size;
+            document.body.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 6000);
+        }
+        setInterval(createHeart, 400);
+
+        let noScale = 1; let yesScale = 1;
+        const messages = ["Are you sure? 🤨", "Pleeaaase? 🥺", "I'll buy you snacks! 🍫", "Don't be mean! 😭", "I'm begging you! 🙇‍♂️", "It'll be your loss! 😤", "Look at the Yes button! 👉", "c'mon please! 🌸", "I won't give up! 🔥", "Yes? 🍭"];
+        let messageIndex = 0;
+
+        function moveAndChange() {
+            const noBtn = document.getElementById('noBtn');
+            const yesBtn = document.getElementById('yesBtn');
+            noBtn.innerText = messages[messageIndex];
+            if (messageIndex < messages.length - 1) messageIndex++;
+            noScale -= 0.08; yesScale += 0.2; 
+            if (noScale < 0.35) noScale = 0.35;
+            noBtn.style.transform = `scale(${noScale})`;
+            yesBtn.style.transform = `scale(${yesScale})`;
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 100);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 100);
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = Math.max(15, x) + 'px';
+            noBtn.style.top = Math.max(15, y) + 'px';
+        }
+
+        function handleNoClick() {
+            if (document.getElementById('noBtn').innerText.includes("Yes?")) {
+                document.getElementById('questionArea').style.display = 'none';
+                document.getElementById('persuasionArea').style.display = 'block';
+            } else { moveAndChange(); }
+        }
+
+        function sayYes() {
+            document.getElementById('questionArea').style.display = 'none';
+            document.getElementById('persuasionArea').style.display = 'none';
+            document.getElementById('letter').style.display = 'block';
+            document.body.style.background = "linear-gradient(135deg, #ffc8dd 0%, #ffafbd 100%)";
+            var end = Date.now() + (3 * 1000);
+            var colors = ['#ff4d6d', '#ffffff', '#ffafbd', '#ffc8dd'];
+            (function frame() {
+              confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
+              confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
+              if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+    </script>
+</body>
+</html>
