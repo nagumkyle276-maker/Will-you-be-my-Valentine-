@@ -11,10 +11,11 @@
             display: flex; justify-content: center; align-items: center;
             height: 100vh;
             background: linear-gradient(135deg, #9d0208 0%, #e0aaff 100%);
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden; text-align: center;
         }
 
+        /* Floating Hearts */
         .heart-particle {
             position: absolute; bottom: -50px;
             background-color: #ff4d6d;
@@ -23,6 +24,12 @@
             opacity: 0.6; z-index: 1;
             animation: floatUp linear forwards;
         }
+        .heart-particle::before, .heart-particle::after {
+            content: ""; background-color: inherit;
+            border-radius: 50%; height: 20px; position: absolute; width: 20px;
+        }
+        .heart-particle::before { top: -10px; left: 0; }
+        .heart-particle::after { left: 10px; top: 0; }
 
         @keyframes floatUp {
             to { transform: rotate(-45deg) translateY(-110vh) scale(1.5); opacity: 0; }
@@ -30,27 +37,29 @@
 
         .container {
             background: rgba(255, 255, 255, 0.95);
-            padding: 2rem; border-radius: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            max-width: 400px; width: 85%;
-            z-index: 10; position: relative; /* Keeps content inside one box */
+            padding: 2.5rem; border-radius: 35px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            max-width: 420px; width: 90%;
+            z-index: 10; position: relative;
+            border: 2px solid #ff4d6d;
         }
 
         .top-image {
-            width: 100%; max-width: 180px; height: 180px;
-            object-fit: contain; border-radius: 15px;
-            margin-bottom: 10px;
+            width: 100%; max-width: 200px; height: 200px;
+            object-fit: contain; border-radius: 20px;
+            margin-bottom: 15px;
         }
 
-        h1 { color: #d00000; font-size: 1.8rem; margin-bottom: 20px; }
+        h1 { color: #d00000; margin-top: 0; font-weight: 800; }
+        p { color: #3c096c; font-weight: 500; }
 
         .buttons {
             display: flex; justify-content: center;
-            gap: 20px; align-items: center; min-height: 100px;
+            gap: 20px; align-items: center; min-height: 120px;
         }
 
         button.choice {
-            padding: 12px 25px; font-size: 1.1rem; border: none;
+            padding: 14px 30px; font-size: 1.2rem; border: none;
             border-radius: 50px; cursor: pointer; font-weight: bold;
             transition: transform 0.2s ease;
         }
@@ -58,8 +67,18 @@
         .primary-yes { background-color: #ff4d6d; color: white; z-index: 5; }
         #noBtn { background-color: #6c757d; color: white; z-index: 100; }
 
-        #persuasionArea, #letter { display: none; }
-        .names { font-family: 'Brush Script MT', cursive; font-size: 2rem; color: #ff4d6d; }
+        #letter, #countdown-box { display: none; }
+        
+        #countdown {
+            margin-top: 20px;
+            font-size: 1.1rem;
+            color: #ba181b;
+            font-weight: bold;
+            background: #fff0f3;
+            padding: 10px;
+            border-radius: 15px;
+            display: inline-block;
+        }
     </style>
 </head>
 <body onclick="startMusic()">
@@ -68,8 +87,8 @@
         <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mpeg">
     </audio>
 
-    <div class="container" id="mainCard">
-        <img id="displayImage" src="pngtree-cartoon-hand-drawn-cute-panda-illustration-png-image_4884774.jpg" class="top-image">
+    <div class="container">
+        <img id="displayImage" src="pngtree-3d-panda-holding-rose-bouquet-on-transparent-background-png-image_14571249.png" class="top-image">
 
         <div id="questionArea">
             <h1>Will you be my Valentine? 💌</h1>
@@ -80,67 +99,96 @@
         </div>
 
         <div id="letter">
-            <h2>I KNEW IT! 🎉</h2>
-            <div class="names">[Your Name] & [Her Name] ❤️</div>
-            <p><strong>See you on the 14th! 🌹</strong></p>
+            <h2>YAY! I KNEW IT! 🎉</h2>
+            <p>I can't wait to spend the day with you! 😍</p>
+            <div id="countdown-box">
+                <p>Time until our date: ⏳</p>
+                <div id="countdown">Loading...</div>
+            </div>
         </div>
     </div>
 
     <script>
         const audio = document.getElementById('bgMusic');
+        const img = document.getElementById('displayImage');
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
-        const img = document.getElementById('displayImage');
         
         let yesScale = 1;
         let moveCount = 0;
+        let musicStarted = false;
 
+        // Sad Panda cycle remains
         const sadImages = ["images (3).png", "images (2) (7).jpeg", "images (2).png", "286-2869713_sad-panda-by-spontaneously-silent-cartoon.png"];
 
         function startMusic() {
-            audio.play().catch(() => {});
+            if (!musicStarted) {
+                audio.play().catch(() => {});
+                musicStarted = true;
+            }
         }
 
         function moveNo() {
             moveCount++;
-            
-            // Change text & image
-            const messages = ["Are you sure?", "Pleeaaase?", "I'll be sad...", "Don't do this!", "Last chance!", "Yes? 🍭"];
+            const messages = ["Sure?", "Please?", "Sad panda...", "Rude!", "Click Yes!", "Yes? 🍭"];
             noBtn.innerText = messages[Math.min(moveCount, messages.length - 1)];
+            
+            // Cycle through sad images on "No"
             img.src = sadImages[moveCount % sadImages.length];
 
-            // Grow Yes Button
-            yesScale += 0.2;
+            yesScale += 0.15;
             yesBtn.style.transform = `scale(${yesScale})`;
 
-            // Move No Button
-            // We use 'fixed' to make it jump around the whole screen after a few tries
             if (moveCount > 1) {
                 noBtn.style.position = 'fixed';
                 const x = Math.random() * (window.innerWidth - 100);
                 const y = Math.random() * (window.innerHeight - 50);
-                noBtn.style.left = x + 'px';
-                noBtn.style.top = y + 'px';
+                noBtn.style.left = Math.max(20, x) + 'px';
+                noBtn.style.top = Math.max(20, y) + 'px';
             }
         }
 
         function sayYes() {
             document.getElementById('questionArea').style.display = 'none';
             document.getElementById('letter').style.display = 'block';
+            document.getElementById('countdown-box').style.display = 'block';
+            
+            // Happy Panda on Yes
             img.src = "cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI1LTEyL3NyLWltYWdlLTE2MTIyNS1oaS0xNi1zLTc1OF8xLnBuZw.jpeg";
             
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            startCountdown();
         }
 
-        // Heart animation
+        function startCountdown() {
+            const targetDate = new Date("February 14, 2026 00:00:00").getTime();
+            
+            setInterval(() => {
+                const now = new Date().getTime();
+                const diff = targetDate - now;
+
+                if (diff < 0) {
+                    document.getElementById('countdown').innerHTML = "It's Valentine's Day! ❤️";
+                    return;
+                }
+
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('countdown').innerHTML = `${d}d ${h}h ${m}m ${s}s`;
+            }, 1000);
+        }
+
         setInterval(() => {
             const heart = document.createElement('div');
             heart.classList.add('heart-particle');
             heart.style.left = Math.random() * 100 + "vw";
-            heart.style.animationDuration = (Math.random() * 3 + 2) + "s";
+            heart.style.animationDuration = (Math.random() * 3 + 3) + "s";
             document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 5000);
-        }, 500);
+            setTimeout(() => heart.remove(), 6000);
+        }, 400);
     </script>
 </body>
 </html>
