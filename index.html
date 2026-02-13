@@ -60,41 +60,24 @@
         button.choice {
             padding: 14px 30px; font-size: 1.2rem; border: none;
             border-radius: 50px; cursor: pointer; font-weight: bold;
-            transition: transform 0.3s ease, background-color 0.3s;
+            transition: transform 0.3s ease;
         }
 
-        .primary-yes { 
-            background-color: #ff4d6d; 
-            color: white; 
-            z-index: 1001; 
-        }
-
+        .primary-yes { background-color: #ff4d6d; color: white; z-index: 1001; }
         #noBtn { background-color: #6c757d; color: white; z-index: 1000; }
 
         #letter, #countdown-box { display: none; }
         
         #countdown {
-            margin-top: 20px;
-            font-size: 1.1rem;
-            color: #ba181b;
-            font-weight: bold;
-            background: #fff0f3;
-            padding: 10px;
-            border-radius: 15px;
-            display: inline-block;
+            margin-top: 20px; font-size: 1.1rem; color: #ba181b; font-weight: bold;
+            background: #fff0f3; padding: 10px; border-radius: 15px; display: inline-block;
         }
 
-        /* Forced Yes styling */
         .fullscreen-yes {
-            position: fixed !important;
-            top: 0 !important; left: 0 !important;
+            position: fixed !important; top: 0 !important; left: 0 !important;
             width: 100vw !important; height: 100vh !important;
-            border-radius: 0 !important;
-            font-size: 4rem !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            border-radius: 0 !important; font-size: 4rem !important;
+            display: flex !important; align-items: center !important; justify-content: center !important;
         }
     </style>
 </head>
@@ -104,7 +87,7 @@
         <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mpeg">
     </audio>
 
-    <div class="container" id="card">
+    <div class="container" id="mainCard">
         <img id="displayImage" src="pngtree-3d-panda-holding-rose-bouquet-on-transparent-background-png-image_14571249.png" class="top-image">
 
         <div id="questionArea">
@@ -119,7 +102,7 @@
             <h2>YAY! I KNEW IT! 🎉</h2>
             <p>I can't wait to spend the day with you! 😍</p>
             <div id="countdown-box">
-                <p>Time until our date: ⏳</p>
+                <p>Time until our date (6:00 PM): ⏳</p>
                 <div id="countdown">Loading...</div>
             </div>
         </div>
@@ -136,23 +119,10 @@
         let musicStarted = false;
 
         const sadImages = ["images (3).png", "images (2) (7).jpeg", "images (2).png", "286-2869713_sad-panda-by-spontaneously-silent-cartoon.png"];
-
-        const messages = [
-            "Are you sure? 🥺",
-            "Pleeaaase say yes! 🙏",
-            "But I'll be so sad... 😭",
-            "Don't break my heart 💔",
-            "I'm begging you! 🙇‍♂️",
-            "Think of the panda! 🐼",
-            "My heart is crying 😿",
-            "Just one 'Yes'? 🍭"
-        ];
+        const messages = ["Are you sure? 🥺", "Pleeaaase? 🙏", "I'll be so sad... 😭", "Don't break my heart 💔", "I'm begging you! 🙇‍♂️", "Think of the panda! 🐼", "My heart is crying 😿", "Just one 'Yes'? 🍭"];
 
         function startMusic() {
-            if (!musicStarted) {
-                audio.play().catch(() => {});
-                musicStarted = true;
-            }
+            if (!musicStarted) { audio.play().catch(() => {}); musicStarted = true; }
         }
 
         function moveNo() {
@@ -160,14 +130,13 @@
             noBtn.innerText = messages[Math.min(moveCount - 1, messages.length - 1)];
             img.src = sadImages[moveCount % sadImages.length];
 
-            // Trigger Fullscreen forced Yes
             if (noBtn.innerText === "Just one 'Yes'? 🍭") {
                 noBtn.style.display = 'none';
                 yesBtn.classList.add('fullscreen-yes');
                 return;
             }
 
-            yesScale += 0.3;
+            yesScale += 0.35;
             yesBtn.style.transform = `scale(${yesScale})`;
 
             if (moveCount > 1) {
@@ -181,262 +150,25 @@
 
         function sayYes() {
             yesBtn.classList.remove('fullscreen-yes');
-            yesBtn.style.display = 'none'; // Hide button after click
+            yesBtn.style.display = 'none';
             document.getElementById('questionArea').style.display = 'none';
             document.getElementById('letter').style.display = 'block';
             document.getElementById('countdown-box').style.display = 'block';
-            
             img.src = "cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI1LTEyL3NyLWltYWdlLTE2MTIyNS1oaS0xNi1zLTc1OF8xLnBuZw.jpeg";
-            
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             startCountdown();
         }
 
         function startCountdown() {
-            // TARGET DATE: Feb 14, 2026 + 18 Hours (6:00 PM)
             const targetDate = new Date("February 14, 2026 18:00:00").getTime();
-            
             setInterval(() => {
                 const now = new Date().getTime();
                 const diff = targetDate - now;
-
-                if (diff < 0) {
-                    document.getElementById('countdown').innerHTML = "Happy Valentine's Day! ❤️";
-                    return;
-                }
-
+                if (diff < 0) { document.getElementById('countdown').innerHTML = "Happy Valentine's Day! ❤️"; return; }
                 const d = Math.floor(diff / (1000 * 60 * 60 * 24));
                 const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-                document.getElementById('countdown').innerHTML = `${d}d ${h}h ${m}m ${s}s`;
-            }, 1000);
-        }
-
-        setInterval(() => {
-            const heart = document.createElement('div');
-            heart.classList.add('heart-particle');
-            heart.style.left = Math.random() * 100 + "vw";
-            heart.style.animationDuration = (Math.random() * 3 + 3) + "s";
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 6000);
-        }, 400);
-    </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Be My Valentine? 🌹</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <style>
-        body {
-            margin: 0; padding: 0;
-            display: flex; justify-content: center; align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #9d0208 0%, #e0aaff 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden; text-align: center;
-        }
-
-        .heart-particle {
-            position: absolute; bottom: -50px;
-            background-color: #ff4d6d;
-            height: 20px; width: 20px;
-            transform: rotate(-45deg);
-            opacity: 0.6; z-index: 1;
-            animation: floatUp linear forwards;
-        }
-        .heart-particle::before, .heart-particle::after {
-            content: ""; background-color: inherit;
-            border-radius: 50%; height: 20px; position: absolute; width: 20px;
-        }
-        .heart-particle::before { top: -10px; left: 0; }
-        .heart-particle::after { left: 10px; top: 0; }
-
-        @keyframes floatUp {
-            to { transform: rotate(-45deg) translateY(-110vh) scale(1.5); opacity: 0; }
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 2.5rem; border-radius: 35px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-            max-width: 420px; width: 90%;
-            z-index: 10; position: relative;
-            border: 2px solid #ff4d6d;
-        }
-
-        .top-image {
-            width: 100%; max-width: 200px; height: 200px;
-            object-fit: contain; border-radius: 20px;
-            margin-bottom: 15px;
-        }
-
-        h1 { color: #d00000; margin-top: 0; font-weight: 800; }
-        p { color: #3c096c; font-weight: 500; }
-
-        .buttons {
-            display: flex; justify-content: center;
-            gap: 20px; align-items: center; min-height: 120px;
-        }
-
-        button.choice {
-            padding: 14px 30px; font-size: 1.2rem; border: none;
-            border-radius: 50px; cursor: pointer; font-weight: bold;
-            transition: transform 0.3s ease, background-color 0.3s;
-        }
-
-        .primary-yes { 
-            background-color: #ff4d6d; 
-            color: white; 
-            z-index: 1001; 
-        }
-
-        #noBtn { background-color: #6c757d; color: white; z-index: 1000; }
-
-        #letter, #countdown-box { display: none; }
-        
-        #countdown {
-            margin-top: 20px;
-            font-size: 1.1rem;
-            color: #ba181b;
-            font-weight: bold;
-            background: #fff0f3;
-            padding: 10px;
-            border-radius: 15px;
-            display: inline-block;
-        }
-
-        /* Forced Yes styling */
-        .fullscreen-yes {
-            position: fixed !important;
-            top: 0 !important; left: 0 !important;
-            width: 100vw !important; height: 100vh !important;
-            border-radius: 0 !important;
-            font-size: 4rem !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-        }
-    </style>
-</head>
-<body onclick="startMusic()">
-
-    <audio id="bgMusic" loop>
-        <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mpeg">
-    </audio>
-
-    <div class="container" id="card">
-        <img id="displayImage" src="pngtree-3d-panda-holding-rose-bouquet-on-transparent-background-png-image_14571249.png" class="top-image">
-
-        <div id="questionArea">
-            <h1>Will you be my Valentine? 💌</h1>
-            <div class="buttons">
-                <button class="choice primary-yes" id="yesBtn" onclick="sayYes()">YES! 🥰</button>
-                <button class="choice" id="noBtn" onmouseover="moveNo()" onclick="moveNo()">No 🥺</button>
-            </div>
-        </div>
-
-        <div id="letter">
-            <h2>YAY! I KNEW IT! 🎉</h2>
-            <p>I can't wait to spend the day with you! 😍</p>
-            <div id="countdown-box">
-                <p>Time until our date: ⏳</p>
-                <div id="countdown">Loading...</div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const audio = document.getElementById('bgMusic');
-        const img = document.getElementById('displayImage');
-        const noBtn = document.getElementById('noBtn');
-        const yesBtn = document.getElementById('yesBtn');
-        
-        let yesScale = 1;
-        let moveCount = 0;
-        let musicStarted = false;
-
-        const sadImages = ["images (3).png", "images (2) (7).jpeg", "images (2).png", "286-2869713_sad-panda-by-spontaneously-silent-cartoon.png"];
-
-        const messages = [
-            "Are you sure? 🥺",
-            "Pleeaaase say yes! 🙏",
-            "But I'll be so sad... 😭",
-            "Don't break my heart 💔",
-            "I'm begging you! 🙇‍♂️",
-            "Think of the panda! 🐼",
-            "My heart is crying 😿",
-            "Just one 'Yes'? 🍭"
-        ];
-
-        function startMusic() {
-            if (!musicStarted) {
-                audio.play().catch(() => {});
-                musicStarted = true;
-            }
-        }
-
-        function moveNo() {
-            moveCount++;
-            noBtn.innerText = messages[Math.min(moveCount - 1, messages.length - 1)];
-            img.src = sadImages[moveCount % sadImages.length];
-
-            // Trigger Fullscreen forced Yes
-            if (noBtn.innerText === "Just one 'Yes'? 🍭") {
-                noBtn.style.display = 'none';
-                yesBtn.classList.add('fullscreen-yes');
-                return;
-            }
-
-            yesScale += 0.3;
-            yesBtn.style.transform = `scale(${yesScale})`;
-
-            if (moveCount > 1) {
-                noBtn.style.position = 'fixed';
-                const x = Math.random() * (window.innerWidth - 150);
-                const y = Math.random() * (window.innerHeight - 80);
-                noBtn.style.left = Math.max(20, x) + 'px';
-                noBtn.style.top = Math.max(20, y) + 'px';
-            }
-        }
-
-        function sayYes() {
-            yesBtn.classList.remove('fullscreen-yes');
-            yesBtn.style.display = 'none'; // Hide button after click
-            document.getElementById('questionArea').style.display = 'none';
-            document.getElementById('letter').style.display = 'block';
-            document.getElementById('countdown-box').style.display = 'block';
-            
-            img.src = "cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI1LTEyL3NyLWltYWdlLTE2MTIyNS1oaS0xNi1zLTc1OF8xLnBuZw.jpeg";
-            
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-            startCountdown();
-        }
-
-        function startCountdown() {
-            // TARGET DATE: Feb 14, 2026 + 18 Hours (6:00 PM)
-            const targetDate = new Date("February 14, 2026 18:00:00").getTime();
-            
-            setInterval(() => {
-                const now = new Date().getTime();
-                const diff = targetDate - now;
-
-                if (diff < 0) {
-                    document.getElementById('countdown').innerHTML = "Happy Valentine's Day! ❤️";
-                    return;
-                }
-
-                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const s = Math.floor((diff % (1000 * 60)) / 1000);
-
                 document.getElementById('countdown').innerHTML = `${d}d ${h}h ${m}m ${s}s`;
             }, 1000);
         }
