@@ -11,7 +11,7 @@
             display: flex; justify-content: center; align-items: center;
             height: 100vh;
             background: linear-gradient(135deg, #9d0208 0%, #e0aaff 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             overflow: hidden; text-align: center;
         }
 
@@ -23,185 +23,124 @@
             opacity: 0.6; z-index: 1;
             animation: floatUp linear forwards;
         }
-        .heart-particle::before, .heart-particle::after {
-            content: ""; background-color: inherit;
-            border-radius: 50%; height: 20px; position: absolute; width: 20px;
-        }
-        .heart-particle::before { top: -10px; left: 0; }
-        .heart-particle::after { left: 10px; top: 0; }
 
         @keyframes floatUp {
             to { transform: rotate(-45deg) translateY(-110vh) scale(1.5); opacity: 0; }
         }
 
-        #musicToggle {
-            position: fixed; top: 25px; right: 25px;
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 12px; border-radius: 50%; cursor: pointer; z-index: 100;
-        }
-
         .container {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(12px);
-            padding: 2.5rem; border-radius: 35px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-            max-width: 450px; width: 90%; z-index: 10;
-            border: 2px solid #ff4d6d;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem; border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            max-width: 400px; width: 85%;
+            z-index: 10; position: relative; /* Keeps content inside one box */
         }
 
         .top-image {
-            width: 100%; max-width: 200px; height: 200px;
-            object-fit: contain; border-radius: 20px;
-            margin-bottom: 15px; transition: all 0.4s ease;
+            width: 100%; max-width: 180px; height: 180px;
+            object-fit: contain; border-radius: 15px;
+            margin-bottom: 10px;
         }
 
-        h1, h2 { color: #d00000; margin-top: 0; font-weight: 800; }
-        p { color: #3c096c; line-height: 1.6; font-size: 1.15rem; font-weight: 500; }
+        h1 { color: #d00000; font-size: 1.8rem; margin-bottom: 20px; }
 
         .buttons {
             display: flex; justify-content: center;
-            gap: 15px; align-items: center; min-height: 130px;
-            position: relative;
+            gap: 20px; align-items: center; min-height: 100px;
         }
 
         button.choice {
-            padding: 14px 30px; font-size: 1.2rem; border: none;
-            border-radius: 50px; cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-weight: bold;
+            padding: 12px 25px; font-size: 1.1rem; border: none;
+            border-radius: 50px; cursor: pointer; font-weight: bold;
+            transition: transform 0.2s ease;
         }
 
-        .primary-yes { background-color: #ff4d6d; color: white; z-index: 11; }
-        #noBtn { background-color: #6c757d; color: white; z-index: 1000; position: relative; }
+        .primary-yes { background-color: #ff4d6d; color: white; z-index: 5; }
+        #noBtn { background-color: #6c757d; color: white; z-index: 100; }
 
         #persuasionArea, #letter { display: none; }
-        .fade-in { animation: fadeIn 0.8s ease-out; }
-
-        .names {
-            font-family: 'Brush Script MT', cursive, sans-serif;
-            font-size: 2.2rem; color: #ff4d6d; margin: 15px 0;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .names { font-family: 'Brush Script MT', cursive; font-size: 2rem; color: #ff4d6d; }
     </style>
 </head>
-<body onclick="autoPlayMusic()">
+<body onclick="startMusic()">
 
     <audio id="bgMusic" loop>
         <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mpeg">
     </audio>
 
-    <button id="musicToggle" onclick="toggleMusic(event)">🎵</button>
-
-    <div class="container">
+    <div class="container" id="mainCard">
         <img id="displayImage" src="pngtree-cartoon-hand-drawn-cute-panda-illustration-png-image_4884774.jpg" class="top-image">
 
-        <div id="questionArea" class="fade-in">
+        <div id="questionArea">
             <h1>Will you be my Valentine? 💌</h1>
             <div class="buttons">
                 <button class="choice primary-yes" id="yesBtn" onclick="sayYes()">YES! 🥰</button>
-                <button class="choice" id="noBtn" onmouseover="moveAndChange()" onclick="moveAndChange()">No 🥺</button>
+                <button class="choice" id="noBtn" onmouseover="moveNo()" onclick="moveNo()">No 🥺</button>
             </div>
         </div>
 
-        <div id="persuasionArea" class="fade-in">
-            <h2>Wait, just one more thing... ✨</h2>
-            <p>I promise to fill our day with all your favorite things 🍦—can we make it official? 💍</p>
-            <div class="buttons">
-                <button class="choice primary-yes" onclick="sayYes()">I'd love to! ❤️</button>
-            </div>
-        </div>
-
-        <div id="letter" class="fade-in">
-            <h2>I KNEW YOU'D SAY YES! 🎉</h2>
+        <div id="letter">
+            <h2>I KNEW IT! 🎉</h2>
+            <div class="names">[Your Name] & [Her Name] ❤️</div>
             <p><strong>See you on the 14th! 🌹</strong></p>
         </div>
     </div>
 
     <script>
         const audio = document.getElementById('bgMusic');
-        const imgElement = document.getElementById('displayImage');
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
-        let musicStarted = false;
-        let lastMove = 0; // To prevent double triggers
-
-        const noImages = ["images (3).png", "images (2) (7).jpeg", "images (2).png", "286-2869713_sad-panda-by-spontaneously-silent-cartoon.png"];
-        let currentImgIndex = 0;
-        const messages = ["Are you sure? 🤨", "Pleeaaase? 🥺", "Don't be mean! 😭", "I'm begging you! 🙇‍♂️", "still no?🙄", "click yes ✨", "I won't give up! 🔥", "Yes? 🍭"];
-        let messageIndex = 0;
+        const img = document.getElementById('displayImage');
+        
         let yesScale = 1;
+        let moveCount = 0;
 
-        function autoPlayMusic() {
-            if (!musicStarted) {
-                audio.play().then(() => { musicStarted = true; document.getElementById('musicToggle').innerText = "⏸️"; }).catch(e => {});
-            }
+        const sadImages = ["images (3).png", "images (2) (7).jpeg", "images (2).png", "286-2869713_sad-panda-by-spontaneously-silent-cartoon.png"];
+
+        function startMusic() {
+            audio.play().catch(() => {});
         }
 
-        function toggleMusic(event) {
-            event.stopPropagation();
-            if (audio.paused) { audio.play(); document.getElementById('musicToggle').innerText = "⏸️"; } 
-            else { audio.pause(); document.getElementById('musicToggle').innerText = "🎵"; }
-        }
+        function moveNo() {
+            moveCount++;
+            
+            // Change text & image
+            const messages = ["Are you sure?", "Pleeaaase?", "I'll be sad...", "Don't do this!", "Last chance!", "Yes? 🍭"];
+            noBtn.innerText = messages[Math.min(moveCount, messages.length - 1)];
+            img.src = sadImages[moveCount % sadImages.length];
 
-        function createHeart() {
-            const heart = document.createElement('div');
-            heart.classList.add('heart-particle');
-            heart.style.left = Math.random() * 100 + "vw";
-            heart.style.animationDuration = Math.random() * 3 + 4 + "s";
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 6000);
-        }
-        setInterval(createHeart, 400);
-
-        function moveAndChange() {
-            const now = Date.now();
-            if (now - lastMove < 300) return; // Debounce for 300ms
-            lastMove = now;
-
-            if (noBtn.innerText === "Yes?") {
-                document.getElementById('questionArea').style.display = 'none';
-                document.getElementById('persuasionArea').style.display = 'block';
-                return;
-            }
-
-            // Update Text & Image
-            noBtn.innerText = messages[messageIndex];
-            if (messageIndex < messages.length - 1) messageIndex++;
-
-            imgElement.src = noImages[currentImgIndex];
-            currentImgIndex = (currentImgIndex + 1) % noImages.length;
-
-            // Scale Yes Button
-            yesScale += 0.15;
+            // Grow Yes Button
+            yesScale += 0.2;
             yesBtn.style.transform = `scale(${yesScale})`;
 
             // Move No Button
-            const x = Math.random() * (window.innerWidth - 150);
-            const y = Math.random() * (window.innerHeight - 100);
-            noBtn.style.position = 'fixed';
-            noBtn.style.left = Math.max(20, x) + 'px';
-            noBtn.style.top = Math.max(20, y) + 'px';
+            // We use 'fixed' to make it jump around the whole screen after a few tries
+            if (moveCount > 1) {
+                noBtn.style.position = 'fixed';
+                const x = Math.random() * (window.innerWidth - 100);
+                const y = Math.random() * (window.innerHeight - 50);
+                noBtn.style.left = x + 'px';
+                noBtn.style.top = y + 'px';
+            }
         }
 
         function sayYes() {
             document.getElementById('questionArea').style.display = 'none';
-            document.getElementById('persuasionArea').style.display = 'none';
             document.getElementById('letter').style.display = 'block';
-            imgElement.src = "cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI1LTEyL3NyLWltYWdlLTE2MTIyNS1oaS0xNi1zLTc1OF8xLnBuZw.jpeg";
-            document.body.style.background = "linear-gradient(135deg, #ffc8dd 0%, #ffafbd 100%)";
+            img.src = "cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI1LTEyL3NyLWltYWdlLTE2MTIyNS1oaS0xNi1zLTc1OF8xLnBuZw.jpeg";
             
-            var end = Date.now() + 3000;
-            (function frame() {
-              confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
-              confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
-              if (Date.now() < end) requestAnimationFrame(frame);
-            }());
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         }
+
+        // Heart animation
+        setInterval(() => {
+            const heart = document.createElement('div');
+            heart.classList.add('heart-particle');
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.animationDuration = (Math.random() * 3 + 2) + "s";
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 5000);
+        }, 500);
     </script>
 </body>
 </html>
