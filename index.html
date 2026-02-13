@@ -39,12 +39,12 @@
         #questionText { color: #d00000; font-size: 1.6rem; margin: 0 0 10px 0; font-weight: 800; }
         #persuasionText { color: #5a189a; font-size: 1.1rem; min-height: 1.5em; margin-bottom: 20px; font-weight: 600; font-style: italic; }
 
-        .buttons { display: flex; justify-content: center; gap: 15px; min-height: 110px; align-items: center; position: relative; }
+        .buttons { display: flex; justify-content: center; gap: 15px; min-height: 110px; align-items: center; }
 
         button.choice {
             padding: 12px 28px; font-size: 1.1rem; border: none;
             border-radius: 50px; cursor: pointer; font-weight: bold;
-            transition: transform 0.2s ease;
+            transition: all 0.2s ease;
         }
 
         .primary-yes { background-color: #ff4d6d; color: white; z-index: 1000; }
@@ -70,9 +70,9 @@
         <div id="questionArea">
             <h1 id="questionText">Will you be my Valentine? 💌</h1>
             <p id="persuasionText">Pretty please? I'll be the happiest panda ever! ✨</p>
-            <div class="buttons" id="btnWrapper">
-                <button class="choice primary-yes" id="yesBtn" onmouseover="handleHover(this)" onclick="askName()">YES! 🥰</button>
-                <button class="choice" id="noBtn" onmouseover="handleHover(this)" onclick="handleNoClick()">No??!!</button>
+            <div class="buttons">
+                <button class="choice primary-yes" id="yesBtn" onclick="askName()">YES! 🥰</button>
+                <button class="choice" id="noBtn" onmouseover="moveNo()" onclick="handleNoClick()">No??!!</button>
             </div>
         </div>
 
@@ -119,25 +119,18 @@
 
         function startMusic() { if (!musicStarted) { audio.play().catch(() => {}); musicStarted = true; } }
 
-        function handleHover(btn) {
-            if (isFinalPhase) return; // Stop moving when we reach the end
+        function moveNo() {
+            if (isFinalPhase) return;
             
             moveCount++;
-            
-            // Persuasion text update
             persuasionText.innerText = messages[Math.min(moveCount-1, messages.length - 1)];
-            
-            // Image update
             img.src = sadImages[moveCount % sadImages.length];
 
-            // Teleport both buttons
-            [yesBtn, noBtn].forEach(b => {
-                b.style.position = 'fixed';
-                b.style.left = Math.random() * (window.innerWidth - 120) + 'px';
-                b.style.top = Math.random() * (window.innerHeight - 60) + 'px';
-            });
+            // Only teleport the NO button
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = Math.random() * (window.innerWidth - 120) + 'px';
+            noBtn.style.top = Math.random() * (window.innerHeight - 60) + 'px';
 
-            // Check if we reached the final message
             if (persuasionText.innerText === "Just say Yes! 🍭") {
                 triggerFinalPhase();
             }
@@ -145,27 +138,16 @@
 
         function triggerFinalPhase() {
             isFinalPhase = true;
-            
-            // Reset buttons to original container flow
-            [yesBtn, noBtn].forEach(b => {
-                b.style.position = 'static';
-                b.style.backgroundColor = '#ff4d6d'; // Both turn pink
-            });
-
-            // Change No button text to Yes
-            yesBtn.innerText = "YES! 🥰";
+            // Snap NO button back to its original position
+            noBtn.style.position = 'static';
+            noBtn.style.backgroundColor = '#ff4d6d';
             noBtn.innerText = "YES!!! ❤️";
-            
-            // Re-center images
             img.src = "286-2869713_sad-panda-by-spontaneously-silent-cartoon.png";
         }
 
         function handleNoClick() {
-            if (isFinalPhase) {
-                askName(); // If it's a "Yes" button now, it works like one
-            } else {
-                handleHover(noBtn); // Otherwise it just runs away
-            }
+            if (isFinalPhase) askName();
+            else moveNo();
         }
 
         function askName() {
@@ -181,7 +163,7 @@
             document.getElementById('countdown-box').style.display = 'block';
 
             document.getElementById('personalGreeting').innerText = `YAY! I KNEW IT, ${name.toUpperCase()}! 🎉`;
-            document.getElementById('sweetMessage').innerText = `I promise to make our date as wonderful as you are. Thank you for making my heart skip a beat! 😍`;
+            document.getElementById('sweetMessage').innerText = `Every second spent with you is a gift. I can't wait for our date! 😍`;
             
             img.src = "cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI1LTEyL3NyLWltYWdlLTE2MTIyNS1oaS0xNi1zLTc1OF8xLnBuZw.jpeg";
             
@@ -213,3 +195,4 @@
     </script>
 </body>
 </html>
+
