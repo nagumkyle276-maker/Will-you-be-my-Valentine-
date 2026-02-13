@@ -48,6 +48,13 @@
         .primary-yes { background-color: #ff4d6d; color: white; z-index: 1000; }
         #noBtn { background-color: #6c757d; color: white; z-index: 999; }
 
+        /* Name Input Styles */
+        #nameInputArea { display: none; margin-top: 20px; }
+        input[type="text"] {
+            padding: 10px; border-radius: 10px; border: 2px solid #ff4d6d;
+            width: 80%; margin-bottom: 10px; outline: none; font-size: 1rem;
+        }
+
         #letter, #countdown-box { display: none; }
         #countdown { margin-top: 15px; font-weight: bold; color: #d00000; background: #fff0f3; padding: 10px; border-radius: 15px; }
 
@@ -72,23 +79,30 @@
         <div id="questionArea">
             <h1>Will you be my Valentine? 💌</h1>
             <div class="buttons">
-                <button class="choice primary-yes" id="yesBtn" onclick="sayYes()">YES! 🥰</button>
+                <button class="choice primary-yes" id="yesBtn" onclick="askName()">YES! 🥰</button>
                 <button class="choice" id="noBtn" onmouseover="moveNo()" onclick="moveNo()">No 🥺</button>
             </div>
         </div>
 
+        <div id="nameInputArea">
+            <p>I'm so happy! What's your name, beautiful? ✨</p>
+            <input type="text" id="userName" placeholder="Enter your name here...">
+            <br>
+            <button class="choice primary-yes" onclick="confirmDate()">Submit ❤️</button>
+        </div>
+
         <div id="letter">
-            <h2>YAY! I KNEW IT! 🎉</h2>
-            <p>I can't wait to see you! 😍</p>
+            <h2 id="personalGreeting">🎉</h2>
+            <p id="sweetMessage"></p>
             <div id="countdown-box">
-                <p>Time until our date: ⏳</p>
+                <p>Counting down the moments until our date: ⏳</p>
                 <div id="countdown"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // Cleans up any potential duplication glitches
+        // Duplication Fix
         function killDuplicates() {
             const cards = document.querySelectorAll('.container');
             if (cards.length > 1) {
@@ -130,16 +144,26 @@
             }
         }
 
-        function sayYes() {
+        function askName() {
             yesBtn.classList.remove('fullscreen-yes');
-            yesBtn.style.display = 'none';
             document.getElementById('questionArea').style.display = 'none';
+            document.getElementById('nameInputArea').style.display = 'block';
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
+
+        function confirmDate() {
+            const name = document.getElementById('userName').value || "My Valentine";
+            document.getElementById('nameInputArea').style.display = 'none';
             document.getElementById('letter').style.display = 'block';
             document.getElementById('countdown-box').style.display = 'block';
+
+            // Personalized sweet message
+            document.getElementById('personalGreeting').innerText = `YAY! I KNEW IT, ${name.toUpperCase()}! 🎉`;
+            document.getElementById('sweetMessage').innerText = `Every second counts when I'm waiting to see you. You've made me the happiest person alive by agreeing to this date! 😍`;
             
             img.src = "cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI1LTEyL3NyLWltYWdlLTE2MTIyNS1oaS0xNi1zLTc1OF8xLnBuZw.jpeg";
             
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
             startCountdown();
         }
 
@@ -147,7 +171,7 @@
             const target = new Date("February 14, 2026 18:00:00").getTime();
             setInterval(() => {
                 const diff = target - new Date().getTime();
-                if (diff < 0) { document.getElementById('countdown').innerHTML = "HAPPY VALENTINE'S! ❤️"; return; }
+                if (diff < 0) { document.getElementById('countdown').innerHTML = "HAPPY VALENTINE'S DAY! ❤️"; return; }
                 const d = Math.floor(diff / 86400000);
                 const h = Math.floor((diff % 86400000) / 3600000);
                 const m = Math.floor((diff % 3600000) / 60000);
