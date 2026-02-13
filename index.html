@@ -6,11 +6,6 @@
     <title>Be My Valentine? 🌹</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        :root {
-            --primary-red: #ba181b;
-            --soft-green: #6a994e;
-        }
-
         body {
             margin: 0; padding: 0;
             display: flex; justify-content: center; align-items: center;
@@ -21,7 +16,6 @@
             transition: background 1.5s ease;
         }
 
-        /* Floating Hearts Animation */
         .heart-particle {
             position: absolute; bottom: -50px;
             background-color: #ff4d6d;
@@ -57,14 +51,14 @@
             border: 2px solid #ff4d6d;
         }
 
-        /* --- THE IMAGE STYLE --- */
         .top-image {
             width: 100%;
-            max-width: 200px; /* Adjust size here */
-            height: auto;
+            max-width: 200px;
+            height: 200px;
+            object-fit: contain;
             border-radius: 20px;
             margin-bottom: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
         }
 
         h1, h2 { color: #d00000; margin-top: 0; font-weight: 800; letter-spacing: -1px; }
@@ -88,6 +82,14 @@
         #persuasionArea, #letter { display: none; }
         .fade-in { animation: fadeIn 0.8s ease-out; }
 
+        .names {
+            font-family: 'Brush Script MT', cursive, sans-serif;
+            font-size: 2.2rem;
+            color: #ff4d6d;
+            margin: 15px 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -103,7 +105,7 @@
     <button id="musicToggle" onclick="toggleMusic(event)">🎵</button>
 
     <div class="container">
-        <img src="pngtree-3d-panda-holding-rose-bouquet-on-transparent-background-png-image_14571249.png" class="top-image">
+        <img id="displayImage" src="pngtree-cartoon-hand-drawn-cute-panda-illustration-png-image_4884774.jpg" class="top-image">
 
         <div id="questionArea" class="fade-in">
             <h1>Will you be my Valentine? 💌</h1>
@@ -126,20 +128,34 @@
             <h2>I KNEW YOU'D SAY YES! 🎉</h2>
             <p>You just made my entire year! 🌟 For our date on <strong>February 14th</strong>, I want to make sure you feel like the luckiest person in the world. 🌎</p>
             <p>I'm planning a beautiful evening just for us. 🕯️ I can't wait to see you! 😍</p>
+            
+    
+            </div>
+            
             <p><strong>See you on the 14th! 🌹</strong></p>
         </div>
     </div>
 
     <script>
         const audio = document.getElementById('bgMusic');
+        const imgElement = document.getElementById('displayImage');
         let musicStarted = false;
+
+        // Cycling through your specific sad/angry images
+        const noImages = [
+            "images (3).png", 
+            "images (2) (7).jpeg", 
+            "images (2).png",
+            "286-2869713_sad-panda-by-spontaneously-silent-cartoon.png" // Angry Panda
+        ];
+        let currentImgIndex = 0;
 
         function autoPlayMusic() {
             if (!musicStarted) {
                 audio.play().then(() => {
                     document.getElementById('musicToggle').innerText = "⏸️";
                     musicStarted = true;
-                }).catch(e => console.log("Waiting for interaction..."));
+                }).catch(e => console.log("Music interaction needed"));
             }
         }
 
@@ -163,18 +179,25 @@
         setInterval(createHeart, 400);
 
         let noScale = 1; let yesScale = 1;
-        const messages = ["Are you sure? 🤨", "Pleeaaase? 🥺", "I'll buy you snacks! 🍫", "Don't be mean! 😭", "I'm begging you! 🙇‍♂️", "It'll be your loss! 😤", "Look at the Yes button! 👉", "c'mon please! 🌸", "I won't give up! 🔥", "Yes? 🍭", "will you really not?😭?", "still no?🙄", "this is not the yes button😤", "click yes", "still choosing no instead of yes? 🤔"];
+        const messages = ["Are you sure? 🤨", "Pleeaaase? 🥺", "Don't be mean! 😭", "I'm begging you! 🙇‍♂️", "still no?🙄", "this is not the yes button😤", "click yes ✨", "I won't give up! 🔥", "Yes? 🍭"];
         let messageIndex = 0;
 
         function moveAndChange() {
             const noBtn = document.getElementById('noBtn');
             const yesBtn = document.getElementById('yesBtn');
+            
             noBtn.innerText = messages[messageIndex];
             if (messageIndex < messages.length - 1) messageIndex++;
+
+            // Update Image
+            imgElement.src = noImages[currentImgIndex];
+            currentImgIndex = (currentImgIndex + 1) % noImages.length;
+
             noScale -= 0.08; yesScale += 0.2; 
             if (noScale < 0.35) noScale = 0.35;
             noBtn.style.transform = `scale(${noScale})`;
             yesBtn.style.transform = `scale(${yesScale})`;
+
             const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 100);
             const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 100);
             noBtn.style.position = 'fixed';
@@ -193,6 +216,10 @@
             document.getElementById('questionArea').style.display = 'none';
             document.getElementById('persuasionArea').style.display = 'none';
             document.getElementById('letter').style.display = 'block';
+            
+            // FINAL IMAGE: Happy Panda
+            imgElement.src = "cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI1LTEyL3NyLWltYWdlLTE2MTIyNS1oaS0xNi1zLTc1OF8xLnBuZw.jpeg";
+            
             document.body.style.background = "linear-gradient(135deg, #ffc8dd 0%, #ffafbd 100%)";
             var end = Date.now() + (3 * 1000);
             var colors = ['#ff4d6d', '#ffffff', '#ffafbd', '#ffc8dd'];
