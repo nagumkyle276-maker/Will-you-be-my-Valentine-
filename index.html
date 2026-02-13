@@ -6,7 +6,6 @@
     <title>Be My Valentine? 🌹</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* This ensures the background and layout are strictly locked */
         html, body {
             height: 100vh; width: 100vw; margin: 0; padding: 0;
             overflow: hidden; background: linear-gradient(135deg, #9d0208 0%, #e0aaff 100%);
@@ -89,7 +88,7 @@
     </div>
 
     <script>
-        // DUPLICATION KILLER: If more than one card exists, delete the extras
+        // Cleans up any potential duplication glitches
         function killDuplicates() {
             const cards = document.querySelectorAll('.container');
             if (cards.length > 1) {
@@ -112,7 +111,7 @@
 
         function moveNo() {
             moveCount++;
-            noBtn.innerText = messages[Math.min(moveCount-1, messages.length-1)];
+            noBtn.innerText = messages[Math.min(moveCount-1, messages.length - 1)];
             img.src = sadImages[moveCount % sadImages.length];
 
             if (noBtn.innerText.includes("Just one 'Yes'?")) {
@@ -137,7 +136,9 @@
             document.getElementById('questionArea').style.display = 'none';
             document.getElementById('letter').style.display = 'block';
             document.getElementById('countdown-box').style.display = 'block';
+            
             img.src = "cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI1LTEyL3NyLWltYWdlLTE2MTIyNS1oaS0xNi1zLTc1OF8xLnBuZw.jpeg";
+            
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             startCountdown();
         }
