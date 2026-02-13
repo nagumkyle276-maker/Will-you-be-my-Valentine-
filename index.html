@@ -67,17 +67,18 @@
         .buttons {
             display: flex; justify-content: center;
             gap: 15px; align-items: center; min-height: 130px;
+            position: relative;
         }
 
         button.choice {
             padding: 14px 30px; font-size: 1.2rem; border: none;
             border-radius: 50px; cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             font-weight: bold;
         }
 
-        .primary-yes { background-color: #ff4d6d; color: white; box-shadow: 0 8px 20px rgba(255, 77, 109, 0.4); }
-        #noBtn { background-color: #6c757d; color: white; position: relative; }
+        .primary-yes { background-color: #ff4d6d; color: white; box-shadow: 0 8px 20px rgba(255, 77, 109, 0.4); z-index: 11; }
+        #noBtn { background-color: #6c757d; color: white; z-index: 12; }
 
         #persuasionArea, #letter { display: none; }
         .fade-in { animation: fadeIn 0.8s ease-out; }
@@ -87,7 +88,6 @@
             font-size: 2.2rem;
             color: #ff4d6d;
             margin: 15px 0;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
         @keyframes fadeIn {
@@ -109,9 +109,9 @@
 
         <div id="questionArea" class="fade-in">
             <h1>Will you be my Valentine? 💌</h1>
-            <div class="buttons">
+            <div class="buttons" id="buttonRow">
                 <button class="choice primary-yes" id="yesBtn" onclick="sayYes()">YES! 🥰</button>
-                <button class="choice" id="noBtn" onmouseover="moveAndChange()" onclick="handleNoClick()">No 🥺</button>
+                <button class="choice" id="noBtn" onmouseover="moveAndChange()" onclick="moveAndChange()">No 🥺</button>
             </div>
         </div>
 
@@ -128,10 +128,8 @@
             <h2>I KNEW YOU'D SAY YES! 🎉</h2>
             <p>You just made my entire year! 🌟 For our date on <strong>February 14th</strong>, I want to make sure you feel like the luckiest person in the world. 🌎</p>
             <p>I'm planning a beautiful evening just for us. 🕯️ I can't wait to see you! 😍</p>
-            
     
             </div>
-            
             <p><strong>See you on the 14th! 🌹</strong></p>
         </div>
     </div>
@@ -141,12 +139,11 @@
         const imgElement = document.getElementById('displayImage');
         let musicStarted = false;
 
-        // Cycling through your specific sad/angry images
         const noImages = [
             "images (3).png", 
             "images (2) (7).jpeg", 
             "images (2).png",
-            "286-2869713_sad-panda-by-spontaneously-silent-cartoon.png" // Angry Panda
+            "286-2869713_sad-panda-by-spontaneously-silent-cartoon.png"
         ];
         let currentImgIndex = 0;
 
@@ -155,7 +152,7 @@
                 audio.play().then(() => {
                     document.getElementById('musicToggle').innerText = "⏸️";
                     musicStarted = true;
-                }).catch(e => console.log("Music interaction needed"));
+                }).catch(e => {});
             }
         }
 
@@ -170,62 +167,294 @@
             heart.classList.add('heart-particle');
             heart.style.left = Math.random() * 100 + "vw";
             heart.style.animationDuration = Math.random() * 3 + 4 + "s";
-            heart.style.opacity = Math.random() * 0.4 + 0.2;
-            const size = Math.random() * 10 + 10 + "px";
-            heart.style.width = size; heart.style.height = size;
             document.body.appendChild(heart);
             setTimeout(() => { heart.remove(); }, 6000);
         }
         setInterval(createHeart, 400);
 
-        let noScale = 1; let yesScale = 1;
-        const messages = ["Are you sure? 🤨", "Pleeaaase? 🥺", "Don't be mean! 😭", "I'm begging you! 🙇‍♂️", "still no?🙄", "this is not the yes button😤", "click yes ✨", "I won't give up! 🔥", "Yes? 🍭"];
+        let noScale = 1; 
+        let yesScale = 1;
+        const messages = ["Are you sure? 🤨", "Pleeaaase? 🥺", "Don't be mean! 😭", "I'm begging you! 🙇‍♂️", "still no?🙄", "click yes ✨", "I won't give up! 🔥", "Yes? 🍭"];
         let messageIndex = 0;
 
         function moveAndChange() {
             const noBtn = document.getElementById('noBtn');
             const yesBtn = document.getElementById('yesBtn');
             
+            // If they manage to click "Yes?" message, go to persuasion
+            if (noBtn.innerText === "Yes?") {
+                document.getElementById('questionArea').style.display = 'none';
+                document.getElementById('persuasionArea').style.display = 'block';
+                return;
+            }
+
             noBtn.innerText = messages[messageIndex];
             if (messageIndex < messages.length - 1) messageIndex++;
 
-            // Update Image
             imgElement.src = noImages[currentImgIndex];
             currentImgIndex = (currentImgIndex + 1) % noImages.length;
 
-            noScale -= 0.08; yesScale += 0.2; 
-            if (noScale < 0.35) noScale = 0.35;
-            noBtn.style.transform = `scale(${noScale})`;
+            // Grow Yes button slightly slower (0.1 instead of 0.2)
+            yesScale += 0.1;
+            noScale -= 0.05;
+            if (noScale < 0.4) noScale = 0.4;
+
             yesBtn.style.transform = `scale(${yesScale})`;
+            noBtn.style.transform = `scale(${noScale})`;
 
-            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 100);
-            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 100);
+            // Random move with padding to avoid overlapping the cursor immediately
+            const padding = 100;
+            const x = Math.random() * (window.innerWidth - padding * 2) + padding;
+            const y = Math.random() * (window.innerHeight - padding * 2) + padding;
+            
             noBtn.style.position = 'fixed';
-            noBtn.style.left = Math.max(15, x) + 'px';
-            noBtn.style.top = Math.max(15, y) + 'px';
-        }
-
-        function handleNoClick() {
-            if (document.getElementById('noBtn').innerText.includes("Yes?")) {
-                document.getElementById('questionArea').style.display = 'none';
-                document.getElementById('persuasionArea').style.display = 'block';
-            } else { moveAndChange(); }
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
         }
 
         function sayYes() {
             document.getElementById('questionArea').style.display = 'none';
             document.getElementById('persuasionArea').style.display = 'none';
             document.getElementById('letter').style.display = 'block';
-            
-            // FINAL IMAGE: Happy Panda
             imgElement.src = "cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI1LTEyL3NyLWltYWdlLTE2MTIyNS1oaS0xNi1zLTc1OF8xLnBuZw.jpeg";
-            
             document.body.style.background = "linear-gradient(135deg, #ffc8dd 0%, #ffafbd 100%)";
+            
             var end = Date.now() + (3 * 1000);
-            var colors = ['#ff4d6d', '#ffffff', '#ffafbd', '#ffc8dd'];
             (function frame() {
-              confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
-              confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
+              confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0 } });
+              confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1 } });
+              if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine? 🌹</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #9d0208 0%, #e0aaff 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden; text-align: center;
+            transition: background 1.5s ease;
+        }
+
+        .heart-particle {
+            position: absolute; bottom: -50px;
+            background-color: #ff4d6d;
+            height: 20px; width: 20px;
+            transform: rotate(-45deg);
+            opacity: 0.6; z-index: 1;
+            animation: floatUp linear forwards;
+        }
+        .heart-particle::before, .heart-particle::after {
+            content: ""; background-color: inherit;
+            border-radius: 50%; height: 20px; position: absolute; width: 20px;
+        }
+        .heart-particle::before { top: -10px; left: 0; }
+        .heart-particle::after { left: 10px; top: 0; }
+
+        @keyframes floatUp {
+            to { transform: rotate(-45deg) translateY(-110vh) scale(1.5); opacity: 0; }
+        }
+
+        #musicToggle {
+            position: fixed; top: 25px; right: 25px;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 12px; border-radius: 50%; cursor: pointer; z-index: 100;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            padding: 2.5rem; border-radius: 35px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            max-width: 450px; width: 90%; z-index: 10;
+            border: 2px solid #ff4d6d;
+        }
+
+        .top-image {
+            width: 100%;
+            max-width: 200px;
+            height: 200px;
+            object-fit: contain;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            transition: all 0.4s ease;
+        }
+
+        h1, h2 { color: #d00000; margin-top: 0; font-weight: 800; letter-spacing: -1px; }
+        p { color: #3c096c; line-height: 1.6; font-size: 1.15rem; font-weight: 500; }
+
+        .buttons {
+            display: flex; justify-content: center;
+            gap: 15px; align-items: center; min-height: 130px;
+            position: relative;
+        }
+
+        button.choice {
+            padding: 14px 30px; font-size: 1.2rem; border: none;
+            border-radius: 50px; cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: bold;
+        }
+
+        .primary-yes { background-color: #ff4d6d; color: white; box-shadow: 0 8px 20px rgba(255, 77, 109, 0.4); z-index: 11; }
+        #noBtn { background-color: #6c757d; color: white; z-index: 12; }
+
+        #persuasionArea, #letter { display: none; }
+        .fade-in { animation: fadeIn 0.8s ease-out; }
+
+        .names {
+            font-family: 'Brush Script MT', cursive, sans-serif;
+            font-size: 2.2rem;
+            color: #ff4d6d;
+            margin: 15px 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body onclick="autoPlayMusic()">
+
+    <audio id="bgMusic" loop>
+        <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mpeg">
+    </audio>
+
+    <button id="musicToggle" onclick="toggleMusic(event)">🎵</button>
+
+    <div class="container">
+        <img id="displayImage" src="pngtree-cartoon-hand-drawn-cute-panda-illustration-png-image_4884774.jpg" class="top-image">
+
+        <div id="questionArea" class="fade-in">
+            <h1>Will you be my Valentine? 💌</h1>
+            <div class="buttons" id="buttonRow">
+                <button class="choice primary-yes" id="yesBtn" onclick="sayYes()">YES! 🥰</button>
+                <button class="choice" id="noBtn" onmouseover="moveAndChange()" onclick="moveAndChange()">No 🥺</button>
+            </div>
+        </div>
+
+        <div id="persuasionArea" class="fade-in">
+            <h2>Wait, just one more thing... ✨</h2>
+            <p>I promise to fill our day with all your favorite things 🍦 and enough smiles to last the whole year! My heart is already set on you 🧸—can we make it official? 💍</p>
+            <div class="buttons">
+                <button class="choice primary-yes" onclick="sayYes()">I'd love to! ❤️</button>
+                <button class="choice primary-yes" onclick="sayYes()">Yes, please! ✨</button>
+            </div>
+        </div>
+
+        <div id="letter" class="fade-in">
+            <h2>I KNEW YOU'D SAY YES! 🎉</h2>
+            <p>You just made my entire year! 🌟 For our date on <strong>February 14th</strong>, I want to make sure you feel like the luckiest person in the world. 🌎</p>
+            <p>I'm planning a beautiful evening just for us. 🕯️ I can't wait to see you! 😍</p>
+            <div class="names">
+                [Your Name] & [Her Name] ❤️
+            </div>
+            <p><strong>See you on the 14th! 🌹</strong></p>
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('bgMusic');
+        const imgElement = document.getElementById('displayImage');
+        let musicStarted = false;
+
+        const noImages = [
+            "images (3).png", 
+            "images (2) (7).jpeg", 
+            "images (2).png",
+            "286-2869713_sad-panda-by-spontaneously-silent-cartoon.png"
+        ];
+        let currentImgIndex = 0;
+
+        function autoPlayMusic() {
+            if (!musicStarted) {
+                audio.play().then(() => {
+                    document.getElementById('musicToggle').innerText = "⏸️";
+                    musicStarted = true;
+                }).catch(e => {});
+            }
+        }
+
+        function toggleMusic(event) {
+            event.stopPropagation();
+            if (audio.paused) { audio.play(); document.getElementById('musicToggle').innerText = "⏸️"; musicStarted = true; } 
+            else { audio.pause(); document.getElementById('musicToggle').innerText = "🎵"; }
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart-particle');
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.animationDuration = Math.random() * 3 + 4 + "s";
+            document.body.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 6000);
+        }
+        setInterval(createHeart, 400);
+
+        let noScale = 1; 
+        let yesScale = 1;
+        const messages = ["Are you sure? 🤨", "Pleeaaase? 🥺", "Don't be mean! 😭", "I'm begging you! 🙇‍♂️", "still no?🙄", "click yes ✨", "I won't give up! 🔥", "Yes? 🍭"];
+        let messageIndex = 0;
+
+        function moveAndChange() {
+            const noBtn = document.getElementById('noBtn');
+            const yesBtn = document.getElementById('yesBtn');
+            
+            // If they manage to click "Yes?" message, go to persuasion
+            if (noBtn.innerText === "Yes?") {
+                document.getElementById('questionArea').style.display = 'none';
+                document.getElementById('persuasionArea').style.display = 'block';
+                return;
+            }
+
+            noBtn.innerText = messages[messageIndex];
+            if (messageIndex < messages.length - 1) messageIndex++;
+
+            imgElement.src = noImages[currentImgIndex];
+            currentImgIndex = (currentImgIndex + 1) % noImages.length;
+
+            // Grow Yes button slightly slower (0.1 instead of 0.2)
+            yesScale += 0.1;
+            noScale -= 0.05;
+            if (noScale < 0.4) noScale = 0.4;
+
+            yesBtn.style.transform = `scale(${yesScale})`;
+            noBtn.style.transform = `scale(${noScale})`;
+
+            // Random move with padding to avoid overlapping the cursor immediately
+            const padding = 100;
+            const x = Math.random() * (window.innerWidth - padding * 2) + padding;
+            const y = Math.random() * (window.innerHeight - padding * 2) + padding;
+            
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+        }
+
+        function sayYes() {
+            document.getElementById('questionArea').style.display = 'none';
+            document.getElementById('persuasionArea').style.display = 'none';
+            document.getElementById('letter').style.display = 'block';
+            imgElement.src = "cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI1LTEyL3NyLWltYWdlLTE2MTIyNS1oaS0xNi1zLTc1OF8xLnBuZw.jpeg";
+            document.body.style.background = "linear-gradient(135deg, #ffc8dd 0%, #ffafbd 100%)";
+            
+            var end = Date.now() + (3 * 1000);
+            (function frame() {
+              confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0 } });
+              confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1 } });
               if (Date.now() < end) requestAnimationFrame(frame);
             }());
         }
