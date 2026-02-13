@@ -163,7 +163,7 @@
         setInterval(createHeart, 400);
 
         let noScale = 1; let yesScale = 1;
-        const messages = ["Are you sure? 🤨", "Pleeaaase? 🥺", "I'll buy you snacks! 🍫", "Don't be mean! 😭", "I'm begging you! 🙇‍♂️", "It'll be your loss! 😤", "Look at the Yes button! 👉", "c'mon please! 🌸", "I won't give up! 🔥", "Yes? 🍭"];
+        const messages = ["Are you sure? 🤨", "Pleeaaase? 🥺", "I'll buy you snacks! 🍫", "Don't be mean! 😭", "I'm begging you! 🙇‍♂️", "It'll be your loss! 😤", "Look at the Yes button! 👉", "c'mon please! 🌸", "I won't give up! 🔥", "Yes? 🍭", "will you really not?😭?", "still no?🙄", "this is not the yes button😤", "click yes", "still choosing no instead of yes? 🤔"];
         let messageIndex = 0;
 
         function moveAndChange() {
